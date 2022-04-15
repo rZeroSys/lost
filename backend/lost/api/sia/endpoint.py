@@ -223,6 +223,7 @@ class Configuration(Resource):
             return "You need to be {} in order to perform this request.".format(roles.ANNOTATOR), 401
         else:
             re = sia.get_configuration(dbm, identity)
+            re['annos']['minArea'] = 10
             dbm.close_session()
             return re
 
