@@ -7,7 +7,7 @@ const canvasConfig = {
         "junk": true
     },
     "annos": {
-        "minArea": 250,
+        "minArea": 16,
         "multilabels": false,
         "actions": {
             "draw": true,

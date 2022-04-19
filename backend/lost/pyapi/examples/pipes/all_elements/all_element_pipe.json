@@ -39,7 +39,7 @@
                   "label": true,
                   "edit": true
               },
-              "minArea": 250
+              "minArea": 16
           },
           "img": {
               "multilabels": false,
