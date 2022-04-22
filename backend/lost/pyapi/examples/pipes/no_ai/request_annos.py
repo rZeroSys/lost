@@ -46,7 +46,7 @@ class RequestAnnos(script.Script):
                 anno_types.append('bbox')
                 lbls.append(random.sample(possible_labels, 2))
             # request annotation only for 'jpg','jpeg', 'bmp' and 'png' image type
-            imgfile_filter = ['.jpg','.jpeg','.bmp','.png'] 
+            imgfile_filter = ['.png']
             for dirpath, dirnames, filenames in os.walk(media_path):
                 for file in filenames:
                     if any(file.endswith(filter) for filter in imgfile_filter):
