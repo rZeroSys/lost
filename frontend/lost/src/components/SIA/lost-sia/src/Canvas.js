@@ -27,18 +27,18 @@ import './SIA.scss'
 
 /**
  * SIA Canvas element that handles annotations within an image
- * 
+ *
  * @param {React.Ref} container - A react ref to a div that defines the
  *      space where this Canvas lives in.
- * @param {object} annos -  A json object containing all annotation 
+ * @param {object} annos -  A json object containing all annotation
  *      information for an image
  *      {
  *          image : {
- *              id: int, 
- *              url: string, 
- *              number: int, 
- *              amount: int, 
- *              isFirst: bool, 
+ *              id: int,
+ *              url: string,
+ *              number: int,
+ *              amount: int,
+ *              isFirst: bool,
  *              isLast: bool
  *          },
  *          annotations: {
@@ -52,21 +52,21 @@ import './SIA.scss'
  *              polygons: []
  *          }
  *      }
- * @param {object} possibleLabels - Possible labels that can be assigned to 
+ * @param {object} possibleLabels - Possible labels that can be assigned to
  *      an annotation.
- *      {   
- *          id: int, 
- *          description: str, 
- *          label: str, (name of the label) 
+ *      {
+ *          id: int,
+ *          description: str,
+ *          label: str, (name of the label)
  *          color: str (color is optional)
  *      }
  * @param {object} image - The actual image blob that will be displayed
  *      {id: int, data: blob}
- * @param {object} uiConfig - User interface configs 
+ * @param {object} uiConfig - User interface configs
  *      {nodesRadius: int, strokeWidth: int}
  * @param {int} layoutUpdate - A counter that triggers a layout update
  *      everytime it is incremented.
- * @param {string} selectedTool - The tool that is selected to draw an 
+ * @param {string} selectedTool - The tool that is selected to draw an
  *      annotation. Possible choices are: 'bBox', 'point', 'line', 'polygon'
  * @param {object} canvasConfig - Configuration for this canvas
  *  {
@@ -97,7 +97,7 @@ import './SIA.scss'
  * @param {bool} imgLabelInputVisible - Controls visibility of the ImgLabelInputPrompt
  * @param {object} layoutOffset - Offset of the canvas inside the container:
  *      {left:int, top:int, right:int, bottom:int} values in pixels.
- * @param {bool} centerCanvasInContainer - Center the canvas in the 
+ * @param {bool} centerCanvasInContainer - Center the canvas in the
  *      middle of the container.
  * @param {str or int} defaultLabel (optional) - Name or ID of the default label that is used
  *      when no label was selected by the annotator. If not set "no label" will be used.
@@ -113,8 +113,8 @@ import './SIA.scss'
  * @event onImgLabelInputClose - ImgLabelInput requests to be closed.
  * @event onNotification - Callback for Notification messages
  *      args: {title: str, message: str, type: str}
- * @event onKeyDown - Fires for keyDown on canvas 
- * @event onKeyUp - Fires for keyUp on canvas 
+ * @event onKeyDown - Fires for keyDown on canvas
+ * @event onKeyUp - Fires for keyUp on canvas
  * @event onAnnoPerformedAction - Fires when an anno performed an action
  *      args: {annoId: int, newAnnos: list of annoObjects, pAction: str}
  */
@@ -123,7 +123,7 @@ class Canvas extends Component{
     constructor(props){
         super(props)
         this.state = {
-            
+
             svg: {
                 width: '100%',
                 height: '100%',
@@ -174,7 +174,7 @@ class Canvas extends Component{
 
     componentDidUpdate(prevProps, prevState){
         // if (this.props.image.id !== prevProps.image.id){
-            
+
         // }
         if (prevProps.annos !== this.props.annos){
             this.setState({
@@ -235,7 +235,7 @@ class Canvas extends Component{
                 this.setState({
                     performedImageInit:true
                 })
-            } 
+            }
             if(prevProps.layoutUpdate !== this.props.layoutUpdate){
                 this.selectAnnotation(undefined)
                 // this.updateCanvasView(this.getAnnoBackendFormat())
@@ -243,7 +243,7 @@ class Canvas extends Component{
                     this.state.annos, this.state.svg
                 ))
             }
-            
+
         }
     }
 
@@ -266,7 +266,7 @@ class Canvas extends Component{
     }
 
     onWheel(e){
-        // Zoom implementation. Note that svg is first scaled and 
+        // Zoom implementation. Note that svg is first scaled and
         // second translated!
         const up = e.deltaY < 0
         const mousePos = this.getMousePosition(e)
@@ -274,7 +274,7 @@ class Canvas extends Component{
         let nextScale
         if (up) {
             nextScale = this.state.svg.scale * zoomFactor
-            
+
         } else {
             nextScale = this.state.svg.scale / zoomFactor
         }
@@ -351,10 +351,10 @@ class Canvas extends Component{
 
         switch(action){
             case keyActions.EDIT_LABEL:
-                // Need to get the newest version of annotation data directly 
+                // Need to get the newest version of annotation data directly
                 // from annotation object, when editing label/ hitting enter
                 // in create mode, since annotation data in canvas are not updated
-                // to this point in time. 
+                // to this point in time.
                 const ar = this.findAnnoRef(this.state.selectedAnnoId)
                 let myAnno = undefined
                 if (ar !== undefined){
@@ -452,11 +452,11 @@ class Canvas extends Component{
     onLabelInputDeleteClick(annoId){
         this.removeSelectedAnno()
     }
-    
-    
+
+
 
     /**
-     * Handle actions that have been performed by an annotation 
+     * Handle actions that have been performed by an annotation
      * @param {Number} anno Id of the annotation
      * @param {String} pAction Action that was performed
      */
@@ -682,7 +682,7 @@ class Canvas extends Component{
                 type: notificationType.WARNING
             })
             return false
-        } 
+        }
         // if (anno.type === 'line' && anno.data.length < 2){
         //     this.handleNotification({
         //         title: "Invalid line!",
@@ -690,7 +690,7 @@ class Canvas extends Component{
         //         type: notificationType.WARNING
         //     })
         //     return false
-        // } 
+        // }
         return true
     }
 
@@ -698,7 +698,7 @@ class Canvas extends Component{
         anno.timestamp = performance.now()
         return anno
     }
-    
+
     stopAnnotimeMeasure(anno){
         if (anno.timestamp === undefined){
             console.error('No timestamp for annotime measurement. Check if you started measurement', anno)
@@ -746,7 +746,7 @@ class Canvas extends Component{
     }
     /**
      * Find a annotation by id in current state
-     * 
+     *
      * @param {int} annoId - Id of the annotation to find
      */
     findAnno(annoId){
@@ -780,7 +780,7 @@ class Canvas extends Component{
             const cState = this.hist.undo()
             this.setCanvasState(
                 cState.entry.annotations,
-                cState.entry.imgLabelIds, 
+                cState.entry.imgLabelIds,
                 cState.entry.selectedAnnoId,
                 cState.entry.showSingleAnno)
         }
@@ -791,7 +791,7 @@ class Canvas extends Component{
             const cState = this.hist.redo()
             this.setCanvasState(
                 cState.entry.annotations,
-                cState.entry.imgLabelIds, 
+                cState.entry.imgLabelIds,
                 cState.entry.selectedAnnoId,
                 cState.entry.showSingleAnno)
         }
@@ -814,7 +814,7 @@ class Canvas extends Component{
 
     /**
      * Set state of Canvas annotations and imageLabels.
-     * 
+     *
      * @param {list} annotations - Annotations in backend format
      * @param {list} imgLabelIds - IDs of the image labels
      * @param {object} selectedAnno - The selected annotation
@@ -879,7 +879,7 @@ class Canvas extends Component{
                 }
             }
         }
-    } 
+    }
 
     getAnnos(annos=undefined, removeFrontedIds=true){
         const myAnnos = annos ? annos : this.state.annos
@@ -921,12 +921,12 @@ class Canvas extends Component{
             trans_x = this.state.svg.translateX - 5
         } else if (vRight.vX <= vXMax){
             trans_x = this.state.svg.translateX +5
-        } 
+        }
         if (vLeft.vY >= yXMin){
             trans_y = this.state.svg.translateY - 5
         } else if (vRight.vY <= yXMax){
             trans_y= this.state.svg.translateY +5
-        }             
+        }
         this.setState({svg: {
             ...this.state.svg,
             translateX: trans_x,
@@ -939,7 +939,7 @@ class Canvas extends Component{
             this.setState({mode: mode})
         }
     }
-    
+
     getMousePosition(e){
         const absPos = this.getMousePositionAbs(e)
         return {
@@ -999,7 +999,7 @@ class Canvas extends Component{
                 id: _.uniqueId('new'),
                 type: this.props.selectedTool,
                 data: [{
-                    x: mousePos.x, 
+                    x: mousePos.x,
                     y: mousePos.y
                 },{
                     x: mousePos.x,
@@ -1018,21 +1018,21 @@ class Canvas extends Component{
                 showSingleAnno: newAnno.id,
                 annoToolBarVisible: false
             })
-            if (this.props.selectedTool !== TOOLS.BBOX && 
-                this.props.selectedTool !== TOOLS.POINT){    
+            if (this.props.selectedTool !== TOOLS.BBOX &&
+                this.props.selectedTool !== TOOLS.POINT){
                 const merged = this.mergeSelectedAnno(newAnno)
                 this.pushHist(
                     merged.newAnnos,
-                    newAnno.id, 
+                    newAnno.id,
                     canvasActions.ANNO_CREATED_NODE,
                     newAnno.id
                 )
             }
-        } 
+        }
     }
 
     putSelectedOnTop(prevState){
-        // The selected annotation need to be rendered as last one in 
+        // The selected annotation need to be rendered as last one in
         // oder to be above all other annotations.
         if (this.state.selectedAnnoId){
             if (prevState.selectedAnnoId !== this.state.selectedAnnoId){
@@ -1063,17 +1063,17 @@ class Canvas extends Component{
                 if (anno.labelIds.length > 0){
                     return this.getLabel(anno.labelIds[0]).color
                 }
-            } 
+            }
         }
         return colorlut.getDefaultColor()
     }
 
     /**
      * Update selected anno and override mode if desired
-     * 
+     *
      * @param {object} anno - The new annotation the becomes the selected anno
      * @param {string} mode - The new mode for the selected anno
-     * @returns The new anno that was set as selectedAnno in state and 
+     * @returns The new anno that was set as selectedAnno in state and
      *      the new annos list that was set in state
      */
     updateSelectedAnno(anno, mode=undefined){
@@ -1082,7 +1082,7 @@ class Canvas extends Component{
         this.setState({
             annos: newAnnos,
             selectedAnnoId: anno.id,
-            prevLabel: anno.labelIds, 
+            prevLabel: anno.labelIds,
         })
         if(this.props.onAnnoSelect){
             if (newAnno !== null){
@@ -1095,7 +1095,7 @@ class Canvas extends Component{
     mergeSelectedAnno(anno, mode=undefined){
         const filtered = this.state.annos.filter( (el) => {
             return el.id !== anno.id
-        }) 
+        })
         let newAnno
         if (mode){
             newAnno = {...anno, mode:mode}
@@ -1127,13 +1127,13 @@ class Canvas extends Component{
     showSingleAnno(annoId){
         if (this.state.showSingleAnno !== annoId){
             this.setState({showSingleAnno: annoId})
-        } 
+        }
     }
 
     updateImageSize(){
-        
+
         var container = this.props.container.current.getBoundingClientRect()
-        
+
         // if (container.left < this.props.uiConfig.toolBarWidth){
         //     canvasLeft = this.props.uiConfig.toolBarWidth + 10
         // } else {
@@ -1144,7 +1144,7 @@ class Canvas extends Component{
         var canvasTop
         var canvasLeft
         var maxImgHeight
-        var maxImgWidth 
+        var maxImgWidth
         if(this.props.layoutOffset){
             canvasTop = container.top + this.props.layoutOffset.top
             canvasLeft = container.left + this.props.layoutOffset.left
@@ -1156,7 +1156,7 @@ class Canvas extends Component{
             maxImgHeight = clientHeight - container.top
             maxImgWidth = container.right -canvasLeft
         }
-        // if (this.props.appliedFullscreen) maxImgHeight = maxImgHeight + 10 
+        // if (this.props.appliedFullscreen) maxImgHeight = maxImgHeight + 10
         var ratio = this.img.current.naturalWidth / this.img.current.naturalHeight
         var imgWidth = "100%"
         var imgHeight = "100%"
@@ -1168,7 +1168,7 @@ class Canvas extends Component{
             imgHeight = maxImgHeight
         }
         if (this.props.centerCanvasInContainer){
-            const resSpaceX = maxImgWidth - imgWidth
+            const resSpaceX = this.props.mirrorImage ? 50 : maxImgWidth - imgWidth
             if (resSpaceX > 2){
                 canvasLeft = canvasLeft + resSpaceX / 2
             }
@@ -1207,10 +1207,10 @@ class Canvas extends Component{
     }
 
     updateCanvasView(annotations){
-        
+
 
         var annos = []
-        //Annotation data should be present and a pixel accurate value 
+        //Annotation data should be present and a pixel accurate value
         //for svg should be calculated
         if(annotations){
             const imgSize = this.updateImageSize()
@@ -1224,7 +1224,7 @@ class Canvas extends Component{
             this.annoRefs = []
             const annos =  this.state.annos.map((el) => {
                 this.annoRefs.push(React.createRef())
-                return <Annotation type={el.type} 
+                return <Annotation type={el.type}
                         data={el} key={el.id} svg={{...this.state.svg}}
                         ref={this.annoRefs[this.annoRefs.length - 1]}
                         onMouseDown={e => this.onAnnoMouseDown(e)}
@@ -1245,12 +1245,12 @@ class Canvas extends Component{
         } else {
             return null
         }
-        
+
     }
 
     renderImgLabelInput(){
         if (!this.props.annos.image) return null
-        return <Prompt 
+        return <Prompt
             onClick={() => this.handleImgLabelInputClose()}
             active={this.props.imgLabelInputVisible}
             header={<div>
@@ -1283,7 +1283,7 @@ class Canvas extends Component{
     renderAnnoToolBar(selectedAnno){
         let visible = this.state.annoToolBarVisible
         if (this.state.mode === modes.CAMERA_MOVE) visible = false
-        return <AnnoToolBar visible={visible} 
+        return <AnnoToolBar visible={visible}
             selectedAnno={selectedAnno}
             svg={this.state.svg}
             onClick={() => this.editAnnoLabel()}
@@ -1294,7 +1294,7 @@ class Canvas extends Component{
     renderAnnoLabelInpput(selectedAnno){
         let visible = this.state.showLabelInput
         if (this.state.mode === modes.CAMERA_MOVE) visible = false
-        return <AnnoLabelInput svg={this.state.svg} 
+        return <AnnoLabelInput svg={this.state.svg}
             // svgRef={this.svg}
             onClose={() => this.onAnnoLabelInputClose()}
             onDeleteClick={annoId => this.onLabelInputDeleteClick(annoId)}
@@ -1313,11 +1313,11 @@ class Canvas extends Component{
         const selectedAnno = this.findAnno(this.state.selectedAnnoId)
         return(
             <div ref={this.container} >
-            <div height={this.state.svg.height} 
-            style={{position: 'fixed', top: this.state.svg.top, left: this.state.svg.left}}
+            <div height={this.state.svg.height}
+            style={{position: 'fixed', top: this.state.svg.top, left: this.state.svg.left, display: 'flex'}}
             >
             {this.renderImgLabelInput()}
-            <ImgBar container={this.container} 
+            <ImgBar container={this.container}
                 visible={this.state.imgBarVisible}
                 possibleLabels={this.state.possibleLabels}
                 annos={this.props.annos}
@@ -1340,7 +1340,7 @@ class Canvas extends Component{
                 {this.renderAnnoToolBar(selectedAnno)}
                 {/* <div style={{position: 'fixed', top: this.props.container.top, left: this.props.container.left}}> */}
                 {this.renderAnnoLabelInpput(selectedAnno)}
-                <svg ref={this.svg} width={this.state.svg.width} 
+                <svg ref={this.svg} width={this.state.svg.width}
                     height={this.state.svg.height}
                     onKeyDown={e => this.onKeyDown(e)}
                     onKeyUp={e => this.onKeyUp(e)}
@@ -1348,7 +1348,7 @@ class Canvas extends Component{
                     onMouseMove={e => this.handleSvgMouseMove(e)}
                     tabIndex="0"
                     >
-                    <g 
+                    <g
                         transform={`scale(${this.state.svg.scale}) translate(${this.state.svg.translateX}, ${this.state.svg.translateY})`}
                         onMouseOver={() => {this.onMouseOver()}}
                         onMouseUp={(e) => {this.onMouseUp(e)}}
@@ -1358,22 +1358,27 @@ class Canvas extends Component{
                         <image
                             onContextMenu={(e) => this.onRightClick(e)}
                             onMouseDown={(e) => this.onMouseDown(e)}
-                            href={this.props.image.data} 
-                            width={this.state.svg.width} 
+                            href={this.props.image.data}
+                            width={this.state.svg.width}
                             height={this.state.svg.height}
                         />
                         {this.renderAnnotations()}
                     </g>
                 </svg>
-                <img 
-                    alt='sia' style={{display:'none'}} ref={this.img} 
+                <img
+                    alt='sia' style={{display:'none'}} ref={this.img}
                     onLoad={() => {this.onImageLoad()}} src={this.state.imageData}
                     width="100%" height="100%"
                 />
                 {/* </div> */}
+                {this.props.mirrorImage && <svg
+                  width={this.props.mirrorImageWidth}
+                  height={this.props.mirrorImageHeight}>
+                  <image href={this.props.mirrorImage.data} width="100%" height="100%" />
+                </svg>}
                 </div>
                 {/* Placeholder for Layout*/}
-                <div style={{minHeight: this.state.svg.height}}></div> 
+                <div style={{minHeight: this.state.svg.height}}></div>
             </div>)
     }
 }

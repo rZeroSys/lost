@@ -24,13 +24,19 @@ import * as filterTools from './filterTools'
 import * as annoConversion from './lost-sia/src/utils/annoConversion'
 
 
-const { 
+const {
     siaLayoutUpdate, getSiaAnnos,
-    getSiaLabels, getSiaConfig, siaSetSVG, getSiaImage, 
+    getSiaLabels, getSiaConfig, siaSetSVG, getSiaImage,
     siaUpdateAnnos, siaSendFinishToBackend,
     selectAnnotation, siaShowImgLabelInput, siaImgIsJunk, getWorkingOnAnnoTask,
     siaGetNextImage, siaGetPrevImage, siaFilterImage, siaApplyFilter
 } = actions
+
+
+const getMirrorUrl = (url) => {
+  const [origExtension] = url.match(/([^\.]+)$/)
+  return url.replace(/[^\.]+$/, origExtension === 'jpg'? 'png': 'jpg')
+}
 
 class SIA extends Component {
 
@@ -43,12 +49,16 @@ class SIA extends Component {
                 id: undefined,
                 data: undefined,
             },
+            mirrorImage: {
+                id: undefined,
+                data: undefined,
+            },
             annos: {
                 image: undefined,
                 annotations: undefined
             },
             layoutOffset: {
-                left: 20,
+                left: 0,
                 top: 0,
                 bottom: 5,
                 right: 5
@@ -59,7 +69,7 @@ class SIA extends Component {
             blockCanvas: false
         }
         this.siteHistory = createHashHistory()
-        
+
         this.container = React.createRef()
         this.canvas = React.createRef()
     }
@@ -172,7 +182,7 @@ class SIA extends Component {
         const newAnnos = this.undoAnnoRotationForUpdate(this.props.filter)
         this.canvas.current.unloadImage()
         this.setState({image: {
-            id: undefined, 
+            id: undefined,
             data:undefined
         }})
         this.props.siaImgIsJunk(false)
@@ -242,7 +252,7 @@ class SIA extends Component {
         //         if (currentFilter.rotate.angle !== 0){
         //             return this.rotateAnnos(-currentFilter.rotate.angle, true)
         //         }
-        //     } 
+        //     }
         // }
         return this.canvas.current.getAnnos(undefined, true)
     }
@@ -257,22 +267,22 @@ class SIA extends Component {
             return {
                 ...el,
                 data: transform.rotateAnnotation(
-                    el.data, 
-                    pivotPoint, 
+                    el.data,
+                    pivotPoint,
                     // {x:0.0,y:0.0},
                     angle)
             }
         })
         // translate annotations into origin of new coordinate system
         let imageCorners = [
-            {x:0, y:0},{x:0, y:svg.height}, 
+            {x:0, y:0},{x:0, y:svg.height},
             {x:svg.width,y:0}, {x:svg.width,y:svg.height}
         ]
         imageCorners = transform.rotateAnnotation(
-            imageCorners, 
-            pivotPoint, 
+            imageCorners,
+            pivotPoint,
             angle)
-    
+
         let transPoint = transform.getMostLeftPoint(transform.getTopPoint(imageCorners))[0]
         // let transPoint = transform.getTopPoint(transform.getMostLeftPoint(imageCorners))[0]
         // if (angle==180 || angle===-180){
@@ -291,7 +301,7 @@ class SIA extends Component {
         let newSize, minCorner, maxCorner
         [minCorner, maxCorner] = transform.getMinMaxPoints(imageCorners)
         newSize = {
-            width: maxCorner.x - minCorner.x, 
+            width: maxCorner.x - minCorner.x,
             height: maxCorner.y - minCorner.y
         }
         // newSize
@@ -343,7 +353,7 @@ class SIA extends Component {
 
             // var b64Response = btoa(response.data);
             // var url = 'data:image/png;base64,'+b64Response;
-            
+
             let bAnnosNew
             if (filter.rotate !== undefined){
                 bAnnosNew = this.rotateAnnos(filter.rotate.angle, false)
@@ -371,8 +381,20 @@ class SIA extends Component {
             {
                 this.setState({
                     image: {
-                        // ...this.state.image, 
-                        id: this.props.annos.image.id, 
+                        // ...this.state.image,
+                        id: this.props.annos.image.id,
+                        data:window.URL.createObjectURL(response),
+                    },
+                    blockCanvas: filterTools.active(this.props.filter)
+                })
+            }
+        )
+        this.props.getSiaImage(getMirrorUrl(this.props.annos.image.url)).then(response=>
+            {
+                this.setState({
+                    mirrorImage: {
+                        // ...this.state.image,
+                        id: `${this.props.annos.image.id}_mirror`,
                         data:window.URL.createObjectURL(response),
                     },
                     blockCanvas: filterTools.active(this.props.filter)
@@ -382,19 +404,19 @@ class SIA extends Component {
         this.props.getWorkingOnAnnoTask()
         if (filterTools.active(this.props.filter)){
             this.filterImage(this.props.filter)
-        }       
+        }
     }
 
     setFullscreen(fullscreen = true) {
         if (fullscreen) {
             if (this.state.fullscreenCSS !== 'sia-fullscreen') {
-                this.setState({ 
+                this.setState({
                     fullscreenCSS: 'sia-fullscreen',
                     layoutOffset: {
                         ...this.state.layoutOffset,
                         left: 50,
                         top: 5,
-                    } 
+                    }
                 })
             }
         } else {
@@ -405,7 +427,7 @@ class SIA extends Component {
                         ...this.state.layoutOffset,
                         left: 20,
                         top: 0,
-                    } 
+                    }
                 })
             }
         }
@@ -414,34 +436,38 @@ class SIA extends Component {
     render() {
         return (
             <div className={this.state.fullscreenCSS} ref={this.container}>
-                <Canvas
-                    ref={this.canvas} 
-                    imgBarVisible={true}
-                    imgLabelInputVisible={this.props.imgLabelInput.show}
-                    container={this.container}
-                    annos={this.state.annos}
-                    image={this.state.image}
-                    uiConfig={this.props.uiConfig}
-                    layoutUpdate={this.props.layoutUpdate}
-                    selectedTool={this.props.selectedTool}
-                    canvasConfig={{
-                        ...this.props.canvasConfig,
-                        annos: {...this.props.canvasConfig.annos, maxAnnos:null}
-                    }}
-                    possibleLabels={this.props.possibleLabels}
-                    onSVGUpdate={svg => this.props.siaSetSVG(svg)}
-                    onAnnoSelect={anno => this.props.selectAnnotation(anno)}
-                    layoutOffset={this.state.layoutOffset}
-                    isJunk={this.props.isJunk}
-                    onImgLabelInputClose={() => this.handleImgLabelInputClose()}
-                    centerCanvasInContainer={true}
-                    onNotification={(messageObj) => this.handleNotification(messageObj)}
-                    onKeyDown={ e => this.handleCanvasKeyDown(e)}
-                    blocked={this.state.blockCanvas}
-                    // defaultLabel='no label'
-                    />
-                <ToolBar 
-                    ref={this.toolbar} 
+                  <Canvas
+                      ref={this.canvas}
+                      imgBarVisible={true}
+                      imgLabelInputVisible={this.props.imgLabelInput.show}
+                      container={this.container}
+                      annos={this.state.annos}
+                      image={this.state.image}
+                      uiConfig={this.props.uiConfig}
+                      layoutUpdate={this.props.layoutUpdate}
+                      selectedTool={this.props.selectedTool}
+                      canvasConfig={{
+                          ...this.props.canvasConfig,
+                          annos: {...this.props.canvasConfig.annos, maxAnnos:null}
+                      }}
+                      possibleLabels={this.props.possibleLabels}
+                      onSVGUpdate={svg => this.props.siaSetSVG(svg)}
+                      onAnnoSelect={anno => this.props.selectAnnotation(anno)}
+                      layoutOffset={this.state.layoutOffset}
+                      isJunk={this.props.isJunk}
+                      onImgLabelInputClose={() => this.handleImgLabelInputClose()}
+                      centerCanvasInContainer={true}
+                      onNotification={(messageObj) => this.handleNotification(messageObj)}
+                      onKeyDown={ e => this.handleCanvasKeyDown(e)}
+                      blocked={this.state.blockCanvas}
+                      mirrorImage={this.state.mirrorImage}
+                      mirrorImageWidth={this.props.svg? this.props.svg.width : 0}
+                      mirrorImageHeight={this.props.svg? this.props.svg.height : 0}
+                      // defaultLabel='no label'
+                      />
+
+                <ToolBar
+                    ref={this.toolbar}
                     onDeleteAllAnnos={() => this.canvas.current.deleteAllAnnos()}
                     />
                 <InfoBoxArea container={this.container}></InfoBoxArea>
