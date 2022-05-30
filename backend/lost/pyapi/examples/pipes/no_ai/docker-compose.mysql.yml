@@ -1,0 +1,17 @@
+version: '2.3'
+services:
+    db-lost:
+      image: mysql:5.7
+      container_name: db-lost
+      volumes:
+          - ${LOST_DATA}/mysql:/var/lib/mysql
+      restart: always
+      environment:
+          MYSQL_DATABASE: ${LOST_DB_NAME}
+          MYSQL_USER: ${LOST_DB_USER}
+          MYSQL_PASSWORD: ${LOST_DB_PASSWORD}
+          MYSQL_ROOT_PASSWORD: ${LOST_DB_ROOT_PASSWORD}
+      ports:
+        - "3306:3306"
+
+
